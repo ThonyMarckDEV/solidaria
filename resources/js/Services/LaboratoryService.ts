@@ -39,13 +39,13 @@ export const LaboratoryServices = {
     }
   },
 
-  async updateLaboratory(laboratory: LaboratoryDates) {
+  async updateLaboratory(id: number, laboratory: LaboratoryDates): Promise<Laboratory> {
     try {
-      const response = await axios.put(`${API_URL}/${laboratory.id}`, laboratory);
-      return response.data as Laboratory;
+      const response = await axios.put<Laboratory>(`${API_URL}/${id}`, laboratory);
+      return response.data;
     } catch (error) {
-      console.error("Error updating laboratory:", error);
-      throw error;
+      console.error(`Error updating laboratory ${id}:`, error);
+      return Promise.reject(error);
     }
   },
 

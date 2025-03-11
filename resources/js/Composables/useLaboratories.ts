@@ -1,11 +1,12 @@
 import { ref, onMounted } from 'vue';
 import { Laboratory, LaboratoryResponse } from '@/Pages/Laboratory/Interfaces/LaboratoryResponse';
-import { getLaboratories, createLaboratory, updateLaboratory, deleteLaboratory } from '@/Services/LaboratoryService';
+import {LaboratoryServices} from '@/Services/LaboratoryService';
+import { LaboratoryDates } from '@/Pages/Laboratory/Interfaces/Laboratory';
 
-export default function useLaboratories(toast: any) {
+export default function useLaboratories(toast) {
     const laboratoriesData = ref<Laboratory[]>([]);
     const loadingTable = ref<boolean>(true);
-    const pagination = ref({
+    const pagination = ref<LaboratoryResponse["pagination"]>({
         total: 0,
         current_page: 1,
         per_page: 20,
@@ -13,6 +14,7 @@ export default function useLaboratories(toast: any) {
         from: 0,
         to: 0
     });
+
     const showCreateModal = ref<boolean>(false);
     const showDeleteModal = ref<boolean>(false);
     const selectedLaboratory = ref<Laboratory | null>(null);
@@ -20,7 +22,7 @@ export default function useLaboratories(toast: any) {
     const fetchLaboratories = async (page = 1, name = '') => {
         loadingTable.value = true;
         try {
-            const response = await getLaboratories(page, name);
+            const response = await LaboratoryServices.getLaboratories(page, name);
             laboratoriesData.value = response.data;
             pagination.value = response.pagination;
         } catch (error) {
@@ -65,33 +67,32 @@ export default function useLaboratories(toast: any) {
         selectedLaboratory.value = null;
     };
 
-    const handleCreateLaboratory = async (laboratory: Omit<Laboratory, 'id' | 'created_at' | 'updated_at'>) => {
+    const handleCreateLaboratory = async (laboratory: LaboratoryDates) => {
         try {
-            await createLaboratory(laboratory);
-            toast.add({
-                severity: 'success',
-                summary: 'Éxito',
-                detail: 'Laboratorio creado exitosamente',
-                life: 3000
-            });
-            await fetchLaboratories();
-            closeCreateModal();
+          await LaboratoryServices.saveLaboratory(laboratory);
+          toast.add({
+            severity: 'success',
+            summary: 'Éxito',
+            detail: 'Laboratorio creado exitosamente',
+            life: 3000
+          });
+          await fetchLaboratories();
+          closeCreateModal();
         } catch (error) {
-            console.error('Error creating laboratory:', error);
-            toast.add({
-                severity: 'error',
-                summary: 'Error',
-                detail: 'Error al crear el laboratorio',
-                life: 3000
-            });
+          console.error('Error creating laboratory:', error);
+          toast.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: 'Error al crear el laboratorio',
+            life: 3000
+          });
         }
-    };
+      };
 
 
-    const handleUpdateLaboratory = async (id: number, data: Partial<Omit<Laboratory, 'id' | 'created_at' | 'updated_at'>>) => {
+      const handleUpdateLaboratory = async (id: number, data: LaboratoryDates) => {
         try {
-         // console.log('Updating laboratory with data:', data);
-          await updateLaboratory(id, data);
+          await LaboratoryServices.updateLaboratory(id, data);
           toast.add({
             severity: 'success',
             summary: 'Éxito',
@@ -113,7 +114,7 @@ export default function useLaboratories(toast: any) {
       
     const handleDeleteLaboratory = async (id: number) => {
         try {
-            await deleteLaboratory(id);
+            await LaboratoryServices.deleteLaboratory(id);
             toast.add({
                 severity: 'success',
                 summary: 'Éxito',
