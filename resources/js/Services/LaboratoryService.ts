@@ -1,30 +1,61 @@
 import axios from "axios";
-import { Laboratory, LaboratoryResponse } from "@/Pages/Laboratory/Interfaces/LaboratoryResponse";
+import { LaboratoryDates,Laboratory } from "@/Pages/Laboratory/Interfaces/Laboratory";
+import { LaboratoryResponse } from "@/Pages/Laboratory/Interfaces/LaboratoryResponse";
 
-// Base API URL
-const API_URL = "/modulo/laboratory";
+const API_URL = '/modulo/laboratory';
 
-export const getLaboratories = async (page = 1, name = "") => {
-    // Corregido para usar la ruta correcta
-    const response = await axios.get(`/modulo/laboratories/list`, {
-        params: { page, name }
-    });
-    return response.data;
-};
 
-export const createLaboratory = async (laboratoryData) => {
-    // Corregido para usar la ruta correcta
-    const response = await axios.post(API_URL, laboratoryData);
-    return response.data;
-};
+export const LaboratoryServices = {
+  async getLaboratories(page: number, name: string = "") {
+    try {
+      const response = await axios.get("/modulo/laboratories/list", {
+        params: { page, name },
+      });
+      return response.data as LaboratoryResponse;
+    } catch (error) {
+      console.error("Error fetching laboratories:", error);
+      throw error;
+    }
+  },
 
-export const updateLaboratory = async (laboratoryId, laboratoryData) => {
-    // Corregido para usar la ruta correcta
-    const response = await axios.put(`${API_URL}/${laboratoryId}`, laboratoryData);
-    return response.data;
-};
+  async getLaboratoryById(id: number) {
+    try {
+      const response = await axios.get(`${API_URL}/${id}`);
+      return response.data as Laboratory;
+    } catch (error) {
+      console.error("Error fetching laboratory:", error);
+      throw error;
+    }
+  },
 
-export const deleteLaboratory = async (laboratoryId) => {
-    // Corregido para usar la ruta correcta
-    await axios.delete(`${API_URL}/${laboratoryId}`);
+  async saveLaboratory(laboratory: LaboratoryDates) {
+    try {
+      console.log("datos:", laboratory);
+      const response = await axios.post(`${API_URL}`, laboratory);
+      return response.data as Laboratory;
+    } catch (error) {
+      console.error("Error saving laboratory:", error);
+      throw error;
+    }
+  },
+
+  async updateLaboratory(laboratory: LaboratoryDates) {
+    try {
+      const response = await axios.put(`${API_URL}/${laboratory.id}`, laboratory);
+      return response.data as Laboratory;
+    } catch (error) {
+      console.error("Error updating laboratory:", error);
+      throw error;
+    }
+  },
+
+  async deleteLaboratory(id: number) {
+    try {
+      const response = await axios.delete(`${API_URL}/${id}`);
+      return response.data;
+    } catch (error) {
+      console.error("Error deleting laboratory:", error);
+      throw error;
+    }
+  },
 };
