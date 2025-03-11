@@ -5,6 +5,9 @@ import { LaboratoryResponse } from "@/Pages/Laboratory/Interfaces/LaboratoryResp
 const API_URL = '/modulo/laboratory';
 
 
+
+//Export global LaboratoryServices
+
 export const LaboratoryServices = {
   async getLaboratories(page: number, name: string = "") {
     try {
